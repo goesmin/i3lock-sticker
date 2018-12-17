@@ -905,7 +905,7 @@ int main(int argc, char *argv[]) {
     if ((username = pw->pw_name) == NULL)
         errx(EXIT_FAILURE, "pw->pw_name is NULL.\n");
 
-    char *optstring = "shvnbdc:p:ui:teI:fl";
+    char *optstring = "s:hvnbdc:p:ui:teI:fl";
     while ((o = getopt_long(argc, argv, optstring, longopts, &longoptind)) != -1) {
         switch (o) {
             case 'v':
@@ -1216,3 +1216,4 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
+

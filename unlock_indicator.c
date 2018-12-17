@@ -134,10 +134,14 @@ xcb_pixmap_t draw_image(uint32_t *resolution) {
         cairo_fill(xcb_ctx);
     }
 
-    if (stk && unlock_state == STATE_I3LOCK_LOCK_FAILED) {
-            cairo_set_source_surface(xcb_ctx, stk, 0, 0);
-            cairo_paint(xcb_ctx);
+    if (stk) {
+        switch (auth_state) {
+            case STATE_AUTH_WRONG:
+                cairo_set_source_surface(xcb_ctx, stk, 0, 0);
+                cairo_paint(xcb_ctx);
+                break;
         }
+    }
 
     if (unlock_indicator &&
         (unlock_state >= STATE_KEY_PRESSED || auth_state > STATE_AUTH_IDLE)) {
