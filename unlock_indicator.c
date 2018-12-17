@@ -134,13 +134,9 @@ xcb_pixmap_t draw_image(uint32_t *resolution) {
         cairo_fill(xcb_ctx);
     }
 
-    if (stk) {
-        switch (auth_state) {
-            case STATE_AUTH_WRONG:
-                cairo_set_source_surface(xcb_ctx, stk, 0, 0);
-                cairo_paint(xcb_ctx);
-                break;
-        }
+    if (stk && (auth_state == STATE_AUTH_WRONG)) {
+        cairo_set_source_surface(xcb_ctx, stk, 1265, 540);
+        cairo_paint(xcb_ctx);
     }
 
     if (unlock_indicator &&
