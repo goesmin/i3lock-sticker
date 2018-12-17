@@ -98,6 +98,7 @@ static uint8_t xkb_base_error;
 static int randr_base = -1;
 
 cairo_surface_t *img = NULL;
+cairo_surface_t *stk = NULL;
 bool tile = false;
 bool ignore_empty_password = false;
 bool skip_repeated_empty_password = false;
@@ -867,6 +868,7 @@ int main(int argc, char *argv[]) {
     struct passwd *pw;
     char *username;
     char *image_path = NULL;
+    char *sticker_path = NULL;
 #ifndef __OpenBSD__
     int ret;
     struct pam_conv conv = {conv_callback, NULL};
@@ -890,6 +892,7 @@ int main(int argc, char *argv[]) {
         {"help", no_argument, NULL, 'h'},
         {"no-unlock-indicator", no_argument, NULL, 'u'},
         {"image", required_argument, NULL, 'i'},
+        {"sticker", required_argument, NULL, 's'},
         {"tiling", no_argument, NULL, 't'},
         {"ignore-empty-password", no_argument, NULL, 'e'},
         {"inactivity-timeout", required_argument, NULL, 'I'},
@@ -902,7 +905,7 @@ int main(int argc, char *argv[]) {
     if ((username = pw->pw_name) == NULL)
         errx(EXIT_FAILURE, "pw->pw_name is NULL.\n");
 
-    char *optstring = "hvnbdc:p:ui:teI:fl";
+    char *optstring = "shvnbdc:p:ui:teI:fl";
     while ((o = getopt_long(argc, argv, optstring, longopts, &longoptind)) != -1) {
         switch (o) {
             case 'v':
@@ -938,6 +941,9 @@ int main(int argc, char *argv[]) {
             case 'i':
                 image_path = strdup(optarg);
                 break;
+            case 's':
+                sticker_path = strdup(optarg);
+                break;
             case 't':
                 tile = true;
                 break;
@@ -969,7 +975,7 @@ int main(int argc, char *argv[]) {
                 break;
             default:
                 errx(EXIT_FAILURE, "Syntax: i3lock [-v] [-n] [-b] [-d] [-c color] [-u] [-p win|default]"
-                                   " [-i image.png] [-t] [-e] [-I timeout] [-f] [-l]");
+                                   " [-i image.png] [-s sticker.png] [-t] [-e] [-I timeout] [-f] [-l]");
         }
     }
 
@@ -1080,6 +1086,18 @@ int main(int argc, char *argv[]) {
         }
     }
     free(image_path);
+
+    if (verify_png_image(sticker_path)) {
+        /* Create a pixmap to render on, fill it with the background color */
+        stk = cairo_image_surface_create_from_png(sticker_path);
+        /* In case loading failed, we just pretend no -s was specified. */
+        if (cairo_surface_status(stk) != CAIRO_STATUS_SUCCESS) {
+            fprintf(stderr, "Could not load sticker \"%s\": %s\n",
+                    sticker_path, cairo_status_to_string(cairo_surface_status(stk)));
+            stk = NULL;
+        }
+    }
+    free(sticker_path);
 
     /* Pixmap on which the image is rendered to (if any) */
     xcb_pixmap_t bg_pixmap = draw_image(last_resolution);

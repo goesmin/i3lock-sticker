@@ -1,3 +1,11 @@
+i3lock-sticker
+==============
+
+A fork of i3lock with an optional useless feature to briefly overlay a custom image upon a failed attempt.
+
+
+Original README follows:
+
 i3lock - improved screen locker
 ===============================
 i3lock is a simple screen locker like slock. After starting it, you will

@@ -52,6 +52,9 @@ extern char *modifier_string;
 /* A Cairo surface containing the specified image (-i), if any. */
 extern cairo_surface_t *img;
 
+/* A Cairo surface containing the specified sticker (-s), if any. */
+extern cairo_surface_t *stk;
+
 /* Whether the image should be tiled. */
 extern bool tile;
 /* The background color to use (in hex). */
@@ -130,6 +133,11 @@ xcb_pixmap_t draw_image(uint32_t *resolution) {
         cairo_rectangle(xcb_ctx, 0, 0, resolution[0], resolution[1]);
         cairo_fill(xcb_ctx);
     }
+
+    if (stk && unlock_state == STATE_I3LOCK_LOCK_FAILED) {
+            cairo_set_source_surface(xcb_ctx, stk, 0, 0);
+            cairo_paint(xcb_ctx);
+        }
 
     if (unlock_indicator &&
         (unlock_state >= STATE_KEY_PRESSED || auth_state > STATE_AUTH_IDLE)) {
